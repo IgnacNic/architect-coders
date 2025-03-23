@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ArchitectCoders</string>
+    <string name="preference_file_key">com.ignacnic.architectcoders.while_in_use_location.PREFERENCE_FILE_KEY</string>
 </resources>
