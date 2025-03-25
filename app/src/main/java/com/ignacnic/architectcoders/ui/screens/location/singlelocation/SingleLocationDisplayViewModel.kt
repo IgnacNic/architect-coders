@@ -38,12 +38,14 @@ class SingleLocationDisplayViewModel(
         anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
     )
     private fun fetchAccurateLocation() {
+        state.update { it.copy(loading = true) }
         viewModelScope.launch {
             locationRepository.requestSingleLocation { location ->
                 state.update{
                     it.copy(
                         location = location,
                         locationFetched = true,
+                        loading = false
                     )
                 }
             }
@@ -66,11 +68,13 @@ class SingleLocationDisplayViewModel(
     var state = MutableStateFlow(UIState(
         location = null,
         locationFetched = false,
+        loading = false,
     ))
         private set
 
     data class UIState(
         val location: MyLocation?,
         val locationFetched: Boolean,
+        val loading: Boolean
     )
 }

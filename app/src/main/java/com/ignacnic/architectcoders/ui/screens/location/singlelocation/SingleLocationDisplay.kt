@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -57,12 +58,16 @@ private fun Content(state: UIState, handler: (Intent) -> Unit = {}) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(
-                onClick = {
-                    locationPermissionState.launchMultiplePermissionRequest()
-                },
-            ) {
-                Text(text = "Get my location")
+            if(!state.loading) {
+                Button(
+                    onClick = {
+                        locationPermissionState.launchMultiplePermissionRequest()
+                    },
+                ) {
+                    Text(text = "Get my location")
+                }
+            } else {
+                CircularProgressIndicator()
             }
             Text(
                 text = if(state.locationFetched) {
@@ -92,6 +97,7 @@ private fun LocationDisplayPreview() {
                         timeStamp = "0"
                     ),
                     locationFetched = true,
+                    loading = false,
                 )
             )
         }
