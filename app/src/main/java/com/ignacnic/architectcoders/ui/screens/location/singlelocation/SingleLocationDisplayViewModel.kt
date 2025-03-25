@@ -39,12 +39,13 @@ class SingleLocationDisplayViewModel(
     )
     private fun fetchAccurateLocation() {
         viewModelScope.launch {
-            val result = locationRepository.requestSingleLocation()
-            state.update{
-                it.copy(
-                    location = result,
-                    locationFetched = true,
-                )
+            locationRepository.requestSingleLocation { location ->
+                state.update{
+                    it.copy(
+                        location = location,
+                        locationFetched = true,
+                    )
+                }
             }
         }
     }

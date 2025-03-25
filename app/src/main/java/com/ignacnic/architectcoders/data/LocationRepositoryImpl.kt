@@ -11,9 +11,11 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.OnCompleteListener
 import com.ignacnic.architectcoders.domain.LocationRepository
 import com.ignacnic.architectcoders.domain.MyLocation
 import com.ignacnic.architectcoders.domain.toMyLocation
+import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
 
 class LocationRepositoryImpl(context: Context) : LocationRepository {
@@ -24,10 +26,10 @@ class LocationRepositoryImpl(context: Context) : LocationRepository {
     private var locationCallback: LocationCallback? = null
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    override fun requestLocationUpdates(lambda: (List<MyLocation>) -> Unit) {
+    override fun requestLocationUpdates(onResult: (List<MyLocation>) -> Unit) {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
-                lambda(result.locations.map { it.toMyLocation() })
+                onResult(result.locations.map { it.toMyLocation() })
             }
         }
         locationCallback?.let {
@@ -49,8 +51,19 @@ class LocationRepositoryImpl(context: Context) : LocationRepository {
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    override suspend fun requestSingleLocation() = locationProvider.getCurrentLocation(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            CancellationTokenSource().token,
-        ).result.toMyLocation()
+    override suspend fun requestSingleLocation(onResult: (MyLocation?) -> Unit) {
+        locationProvider
+            .getCurrentLocation(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                CancellationTokenSource().token,
+            )
+            .addOnCompleteListener {
+                onResult(
+                    if (it.isSuccessful)
+                        it.result?.toMyLocation()
+                    else
+                        null
+                )
+            }
+    }
 }
