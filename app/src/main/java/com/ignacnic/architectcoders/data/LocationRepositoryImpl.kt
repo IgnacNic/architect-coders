@@ -11,11 +11,9 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
-import com.google.android.gms.tasks.OnCompleteListener
-import com.ignacnic.architectcoders.domain.LocationRepository
-import com.ignacnic.architectcoders.domain.MyLocation
-import com.ignacnic.architectcoders.domain.toMyLocation
-import kotlinx.coroutines.tasks.await
+import com.ignacnic.architectcoders.domain.location.LocationRepository
+import com.ignacnic.architectcoders.domain.location.MyLocation
+import com.ignacnic.architectcoders.domain.location.toMyLocation
 import java.util.concurrent.TimeUnit
 
 class LocationRepositoryImpl(context: Context) : LocationRepository {

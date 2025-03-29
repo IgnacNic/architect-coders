@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.domain
+package com.ignacnic.architectcoders.domain.location
 
 interface LocationRepository {
 
