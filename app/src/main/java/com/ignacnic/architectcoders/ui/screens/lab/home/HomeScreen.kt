@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.ui.screens.home
+package com.ignacnic.architectcoders.ui.screens.lab.home
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
