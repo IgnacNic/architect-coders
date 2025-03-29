@@ -1,22 +1,18 @@
 package com.ignacnic.architectcoders.data
 
 import com.ignacnic.architectcoders.domain.ElevationRepository
-import com.ignacnic.architectcoders.domain.MyLocation
+import com.ignacnic.architectcoders.domain.location.MyLocation
 
-class ElevationRepositoryImpl : ElevationRepository {
-    override suspend fun getElevationForLocations(locations: List<MyLocation>): List<Pair<MyLocation, Double>> {
-        val latitudes = locations.fold(initial = locations.first().latitude) { acc, nextLocation ->
-            "$acc,${nextLocation.latitude}"
+class ElevationRepositoryImpl(private val elevationHttpService: ElevationHttpService) : ElevationRepository {
+    override suspend fun getElevationForLocations(locations: List<MyLocation>): List<Double> {
+        val latitudes = locations.joinToString(separator = ",") {
+            it.latitude
         }
-        val longitudes = locations.fold(initial = locations.first().longitude) { acc, nextLocation ->
-            "$acc,${nextLocation.longitude}"
+        val longitudes = locations.joinToString(separator = ",") {
+            it.longitude
         }
-        return ElevationClient
-            .instance
+        return elevationHttpService
             .getCoordinatesElevation(latitude = latitudes, longitude = longitudes)
             .elevation
-            .mapIndexed { i, elevation ->
-                Pair(locations[i], elevation)
-            }
     }
 }

@@ -8,6 +8,6 @@ interface ElevationHttpService {
     @GET("elevation")
     suspend fun getCoordinatesElevation(
         @Query("latitude") latitude: String,
-        @Query("latitude") longitude: String,
+        @Query("longitude") longitude: String,
     ): ElevationResult
 }
