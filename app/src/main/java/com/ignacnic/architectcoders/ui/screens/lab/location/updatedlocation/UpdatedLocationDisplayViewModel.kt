@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.ui.screens.location.updatedlocation
+package com.ignacnic.architectcoders.ui.screens.lab.location.updatedlocation
 
 import android.Manifest
 import androidx.annotation.RequiresPermission
@@ -6,8 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.ignacnic.architectcoders.domain.LocationRepository
-import com.ignacnic.architectcoders.domain.MyLocation
+import com.ignacnic.architectcoders.domain.location.LocationRepository
+import com.ignacnic.architectcoders.domain.location.MyLocation
 
 class UpdatedLocationDisplayViewModel(private val locationRepository: LocationRepository) : ViewModel() {
 

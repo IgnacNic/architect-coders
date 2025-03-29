@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.ui.screens.location.singlelocation
+package com.ignacnic.architectcoders.ui.screens.lab.location.singlelocation
 
 import android.Manifest
 import androidx.compose.foundation.layout.Arrangement
@@ -20,10 +20,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.ignacnic.architectcoders.domain.MyLocation
+import com.ignacnic.architectcoders.domain.location.MyLocation
 import com.ignacnic.architectcoders.ui.screens.Screen
-import com.ignacnic.architectcoders.ui.screens.location.singlelocation.SingleLocationDisplayViewModel.Intent
-import com.ignacnic.architectcoders.ui.screens.location.singlelocation.SingleLocationDisplayViewModel.UIState
+import com.ignacnic.architectcoders.ui.screens.lab.location.singlelocation.SingleLocationDisplayViewModel.Intent
+import com.ignacnic.architectcoders.ui.screens.lab.location.singlelocation.SingleLocationDisplayViewModel.UIState
 import com.ignacnic.architectcoders.ui.theme.ArchitectCodersTheme
 
 
@@ -58,7 +58,7 @@ private fun Content(state: UIState, handler: (Intent) -> Unit = {}) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if(!state.loading) {
+            if(!state.locationLoading) {
                 Button(
                     onClick = {
                         locationPermissionState.launchMultiplePermissionRequest()
@@ -80,6 +80,20 @@ private fun Content(state: UIState, handler: (Intent) -> Unit = {}) {
                     ""
                 }
             )
+            if (state.locationFetched && state.location != null) {
+                Button(
+                    onClick = { handler(Intent.RequestElevation) }
+                ) {
+                    if (state.elevationLoading){
+                        CircularProgressIndicator()
+                    } else {
+                        Text(text = "Get your elevation")
+                    }
+                }
+                if (state.elevation != null) {
+                    Text(text = "Your elevation is ${state.elevation} meters")
+                }
+            }
         }
     }
 }
@@ -97,7 +111,9 @@ private fun LocationDisplayPreview() {
                         timeStamp = "0"
                     ),
                     locationFetched = true,
-                    loading = false,
+                    locationLoading = false,
+                    elevationLoading = false,
+                    elevation = null,
                 )
             )
         }

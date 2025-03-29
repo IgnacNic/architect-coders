@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.ui.screens.location.updatedlocation
+package com.ignacnic.architectcoders.ui.screens.lab.location.updatedlocation
 
 import android.Manifest
 import androidx.compose.foundation.layout.Column
