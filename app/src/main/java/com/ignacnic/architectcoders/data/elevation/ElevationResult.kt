@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.data
+package com.ignacnic.architectcoders.data.elevation
 
 
 import kotlinx.serialization.SerialName

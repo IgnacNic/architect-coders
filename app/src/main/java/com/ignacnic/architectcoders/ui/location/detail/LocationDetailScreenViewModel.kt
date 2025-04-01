@@ -2,7 +2,7 @@ package com.ignacnic.architectcoders.ui.screens.location.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ignacnic.architectcoders.domain.ElevationRepository
+import com.ignacnic.architectcoders.domain.elevation.ElevationRepository
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update

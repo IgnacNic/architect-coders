@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.data
+package com.ignacnic.architectcoders.data.elevation
 
 import android.util.Log
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory

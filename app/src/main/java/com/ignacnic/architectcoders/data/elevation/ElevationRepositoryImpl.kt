@@ -1,9 +1,10 @@
-package com.ignacnic.architectcoders.data
+package com.ignacnic.architectcoders.data.elevation
 
-import com.ignacnic.architectcoders.domain.ElevationRepository
+import com.ignacnic.architectcoders.domain.elevation.ElevationRepository
 import com.ignacnic.architectcoders.domain.location.MyLocation
 
-class ElevationRepositoryImpl(private val elevationHttpService: ElevationHttpService) : ElevationRepository {
+class ElevationRepositoryImpl(private val elevationHttpService: ElevationHttpService) :
+    ElevationRepository {
     override suspend fun getElevationForLocations(locations: List<MyLocation>): List<Double> {
         val latitudes = locations.joinToString(separator = ",") {
             it.latitude

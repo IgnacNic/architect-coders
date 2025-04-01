@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.ui.screens
+package com.ignacnic.architectcoders.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface

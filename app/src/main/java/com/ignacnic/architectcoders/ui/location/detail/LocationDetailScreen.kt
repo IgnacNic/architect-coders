@@ -25,7 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ignacnic.architectcoders.R
-import com.ignacnic.architectcoders.ui.screens.Screen
+import com.ignacnic.architectcoders.ui.Screen
 import com.ignacnic.architectcoders.ui.screens.location.detail.LocationDetailScreenViewModel.UiState
 import com.ignacnic.architectcoders.ui.screens.location.detail.LocationDetailScreenViewModel.Action
 

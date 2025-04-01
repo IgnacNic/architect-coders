@@ -32,7 +32,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.ignacnic.architectcoders.R
 import com.ignacnic.architectcoders.domain.location.MyLocation
-import com.ignacnic.architectcoders.ui.screens.Screen
+import com.ignacnic.architectcoders.ui.Screen
 import com.ignacnic.architectcoders.ui.screens.location.requester.LocationRequesterScreenViewModel.Action
 import com.ignacnic.architectcoders.ui.screens.location.requester.LocationRequesterScreenViewModel.UiState
 

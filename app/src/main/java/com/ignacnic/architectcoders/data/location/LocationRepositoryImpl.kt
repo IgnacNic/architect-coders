@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.data
+package com.ignacnic.architectcoders.data.location
 
 import android.Manifest
 import android.content.Context
