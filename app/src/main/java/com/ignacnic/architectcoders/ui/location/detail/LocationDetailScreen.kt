@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.ui.screens.location.detail
+package com.ignacnic.architectcoders.ui.location.detail
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,8 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ignacnic.architectcoders.R
 import com.ignacnic.architectcoders.ui.Screen
-import com.ignacnic.architectcoders.ui.screens.location.detail.LocationDetailScreenViewModel.UiState
-import com.ignacnic.architectcoders.ui.screens.location.detail.LocationDetailScreenViewModel.Action
+import com.ignacnic.architectcoders.ui.location.detail.LocationDetailScreenViewModel.UiState
+import com.ignacnic.architectcoders.ui.location.detail.LocationDetailScreenViewModel.Action
 
 @Composable
 fun LocationDetailScreen(

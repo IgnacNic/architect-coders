@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.ui.screens.location.requester
+package com.ignacnic.architectcoders.ui.location.requester
 
 import android.Manifest
 import androidx.annotation.RequiresPermission

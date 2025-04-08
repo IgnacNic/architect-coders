@@ -13,10 +13,10 @@ import com.ignacnic.architectcoders.data.elevationRepository
 import com.ignacnic.architectcoders.data.locationRepository
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import com.ignacnic.architectcoders.domain.location.MyLocationType
-import com.ignacnic.architectcoders.ui.screens.location.detail.LocationDetailScreen
-import com.ignacnic.architectcoders.ui.screens.location.detail.LocationDetailScreenViewModel
-import com.ignacnic.architectcoders.ui.screens.location.requester.LocationRequesterScreen
-import com.ignacnic.architectcoders.ui.screens.location.requester.LocationRequesterScreenViewModel
+import com.ignacnic.architectcoders.ui.location.detail.LocationDetailScreen
+import com.ignacnic.architectcoders.ui.location.detail.LocationDetailScreenViewModel
+import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreen
+import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel
 import kotlin.reflect.typeOf
 
 class MainActivity : ComponentActivity() {

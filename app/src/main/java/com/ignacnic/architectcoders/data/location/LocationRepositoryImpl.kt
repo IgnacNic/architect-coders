@@ -34,7 +34,7 @@ class LocationRepositoryImpl(context: Context) : LocationRepository {
             locationProvider.requestLocationUpdates(
                 LocationRequest.Builder(
                     /*priority*/ Priority.PRIORITY_HIGH_ACCURACY,
-                    /*intervalMillis*/ TimeUnit.SECONDS.toMillis(3),
+                    /*intervalMillis*/ TimeUnit.SECONDS.toMillis(REFRESH_INTERVAL_SECONDS),
                 ).build(),
                 it,
                 Looper.getMainLooper()
@@ -63,5 +63,9 @@ class LocationRepositoryImpl(context: Context) : LocationRepository {
                         null
                 )
             }
+    }
+
+    companion object {
+        const val REFRESH_INTERVAL_SECONDS = 3L
     }
 }

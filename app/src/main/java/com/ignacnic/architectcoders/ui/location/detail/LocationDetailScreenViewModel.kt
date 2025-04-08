@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.ui.screens.location.detail
+package com.ignacnic.architectcoders.ui.location.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
