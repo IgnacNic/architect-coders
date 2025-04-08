@@ -18,6 +18,7 @@ playServicesLocation = "21.3.0"
 retrofit = "2.11.0"
 kotlinxSerialization = "1.8.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
+detekt = "1.23.8"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
@@ -51,4 +52,5 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 
