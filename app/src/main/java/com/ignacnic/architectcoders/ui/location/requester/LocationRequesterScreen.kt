@@ -1,4 +1,4 @@
-package com.ignacnic.architectcoders.ui.screens.location.requester
+package com.ignacnic.architectcoders.ui.location.requester
 
 import android.Manifest
 import androidx.compose.foundation.layout.Arrangement
@@ -33,8 +33,8 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.ignacnic.architectcoders.R
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import com.ignacnic.architectcoders.ui.Screen
-import com.ignacnic.architectcoders.ui.screens.location.requester.LocationRequesterScreenViewModel.Action
-import com.ignacnic.architectcoders.ui.screens.location.requester.LocationRequesterScreenViewModel.UiState
+import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.Action
+import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.UiState
 
 
 @Composable
@@ -92,52 +92,64 @@ private fun RequesterContent(
                 }
             }
             items(state.locationUpdates) { item ->
-                Card(
-                    modifier = Modifier.
-                    padding(horizontal = 12.dp, vertical = 6.dp)
-                        .fillMaxWidth(),
-                    onClick = {
-                        onCardClick(item)
-                    }
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        val latitude = buildAnnotatedString {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("Latitude: ")
-                            }
-                            append(item.latitude)
-                        }
-                        val longitude = buildAnnotatedString {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("Longitude: ")
-                            }
-                            append(item.longitude)
-                        }
-                        val timeStamp = buildAnnotatedString {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("Timestamp: ")
-                            }
-                            append(item.timeStamp)
-                        }
-                        Column(modifier = Modifier.padding(8.dp).weight(1f)) {
-                            Text(latitude)
-                            Text(longitude)
-                            Text(timeStamp)
-                        }
-                        Icon(
-                            painter = painterResource(R.drawable.ic_location),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            contentDescription = "Location",
-                            modifier = Modifier
-                                .padding(end = 12.dp)
-                                .size(40.dp),
-                        )
-                    }
-                }
+                LocationListItem(
+                    item = item,
+                    onCardClick = onCardClick,
+                )
             }
+        }
+    }
+}
+
+@Composable
+private fun LocationListItem(
+    item: MyLocation,
+    modifier: Modifier = Modifier,
+    onCardClick: (MyLocation) -> Unit = {},
+) {
+    Card(
+        modifier = modifier.
+        padding(horizontal = 12.dp, vertical = 6.dp)
+            .fillMaxWidth(),
+        onClick = {
+            onCardClick(item)
+        }
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            val latitude = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Latitude: ")
+                }
+                append(item.latitude)
+            }
+            val longitude = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Longitude: ")
+                }
+                append(item.longitude)
+            }
+            val timeStamp = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Timestamp: ")
+                }
+                append(item.timeStamp)
+            }
+            Column(modifier = Modifier.padding(8.dp).weight(1f)) {
+                Text(latitude)
+                Text(longitude)
+                Text(timeStamp)
+            }
+            Icon(
+                painter = painterResource(R.drawable.ic_location),
+                tint = MaterialTheme.colorScheme.onSurface,
+                contentDescription = "Location",
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .size(40.dp),
+            )
         }
     }
 }
