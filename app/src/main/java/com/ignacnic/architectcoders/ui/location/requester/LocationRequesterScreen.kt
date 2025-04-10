@@ -1,6 +1,9 @@
 package com.ignacnic.architectcoders.ui.location.requester
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -33,9 +37,11 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.ignacnic.architectcoders.BuildConfig
 import com.ignacnic.architectcoders.R
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import com.ignacnic.architectcoders.ui.Screen
+import com.ignacnic.architectcoders.ui.location.LocationRationaleDialog
 import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.Action
 import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.UiState
 import com.ignacnic.architectcoders.ui.theme.ArchitectCodersTheme
@@ -74,6 +80,20 @@ private fun RequesterContent(
             TopAppBar( title = { Text("Find my location") })
         }
     ) { innerPadding ->
+        if (state.locationRationaleNeeded) {
+            val context = LocalContext.current
+            LocationRationaleDialog(
+                onAccept = {
+                    context.startActivity(
+                        Intent(
+                            ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                        )
+                    )
+                },
+                onDismiss = { reduce(Action.RationaleDialogDismissed) },
+            )
+        }
         LazyColumn(
             modifier = Modifier.padding(innerPadding)
         ) {
@@ -115,8 +135,8 @@ private fun LocationListItem(
     onCardClick: (MyLocation) -> Unit = {},
 ) {
     Card(
-        modifier = modifier.
-        padding(horizontal = 12.dp, vertical = 6.dp)
+        modifier = modifier
+            .padding(horizontal = 12.dp, vertical = 6.dp)
             .fillMaxWidth(),
         onClick = {
             onCardClick(item)
@@ -144,7 +164,9 @@ private fun LocationListItem(
                 }
                 append(item.timeStamp)
             }
-            Column(modifier = Modifier.padding(8.dp).weight(1f)) {
+            Column(modifier = Modifier
+                .padding(8.dp)
+                .weight(1f)) {
                 Text(latitude)
                 Text(longitude)
                 Text(timeStamp)
@@ -190,6 +212,23 @@ private fun EmptyRequesterPreview() {
             UiState(
                 locationUpdates = emptyList(),
                 updatesRunning = false,
+                locationRationaleNeeded = false,
+            ),
+            MultiplePermissionsStatePreview(),
+        )
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview
+@Composable
+private fun DialogRequesterPreview() {
+    ArchitectCodersTheme {
+        RequesterContent(
+            UiState(
+                locationUpdates = emptyList(),
+                updatesRunning = false,
+                locationRationaleNeeded = true,
             ),
             MultiplePermissionsStatePreview(),
         )
@@ -211,6 +250,7 @@ private fun FilledRequesterPreview() {
                     )
                 ),
                 updatesRunning = true,
+                locationRationaleNeeded = false,
             ),
             MultiplePermissionsStatePreview(),
         )
