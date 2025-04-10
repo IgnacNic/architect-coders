@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ignacnic.architectcoders.domain.elevation.ElevationRepository
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -21,7 +22,7 @@ class LocationDetailScreenViewModel(
         val elevation: Double?,
     )
 
-    var state = MutableStateFlow(
+    private val _state = MutableStateFlow(
         UiState(
             latitude = location.latitude,
             longitude = location.longitude,
@@ -30,7 +31,8 @@ class LocationDetailScreenViewModel(
             elevation = null,
         )
     )
-    private set
+    val state = _state.asStateFlow()
+
 
     sealed interface Action {
         data object onUiLoad: Action
@@ -45,7 +47,7 @@ class LocationDetailScreenViewModel(
     }
 
     private fun requestElevation() {
-        state.update {
+        _state.update {
             it.copy(
                 elevation = null,
                 loading = true
@@ -55,7 +57,7 @@ class LocationDetailScreenViewModel(
             val elevation = elevationRepository.getElevationForLocations(
                 locations = listOf(location)
             ).firstOrNull()
-            state.update {
+            _state.update {
                 it.copy(
                     elevation = elevation,
                     loading = false,
