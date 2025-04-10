@@ -109,7 +109,7 @@ private fun DetailContent(
 
 @Preview
 @Composable
-private fun DetailPreview() {
+private fun LoadedDetailPreview() {
     ArchitectCodersTheme {
         DetailContent(
             state = UiState(
@@ -118,6 +118,38 @@ private fun DetailPreview() {
                 time = "0",
                 loading = false,
                 elevation = 666.0,
+            ),
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun LoadingDetailPreview() {
+    ArchitectCodersTheme {
+        DetailContent(
+            state = UiState(
+                latitude = "40.42189",
+                longitude = "-3.682189",
+                time = "0",
+                loading = true,
+                elevation = null,
+            ),
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ErrorDetailPreview() {
+    ArchitectCodersTheme {
+        DetailContent(
+            state = UiState(
+                latitude = "40.42189",
+                longitude = "-3.682189",
+                time = "0",
+                loading = false,
+                elevation = null,
             ),
         )
     }
