@@ -16,17 +16,21 @@ class LocationRequesterScreenViewModel(
     sealed interface Action {
         data class PermissionResult(val permissionStates: Map<String, Boolean>): Action
         data object UpdatesStopped: Action
+        data object RationaleDialogDismissed: Action
+        data object RationaleDialogConfirmed: Action
     }
 
     data class UiState(
         val locationUpdates: List<MyLocation>,
         val updatesRunning: Boolean,
+        val locationRationaleNeeded: Boolean,
     )
 
     private val _state = MutableStateFlow(
         UiState(
             locationUpdates = listOf(),
             updatesRunning = false,
+            locationRationaleNeeded = false,
         )
     )
     val state = _state.asStateFlow()
@@ -35,7 +39,9 @@ class LocationRequesterScreenViewModel(
     fun reduceAction(action: Action) {
         when (action) {
             is Action.PermissionResult -> onPermissionsRequestResult(action.permissionStates)
-            is Action.UpdatesStopped -> onStopUpdates()
+            Action.UpdatesStopped -> onStopUpdates()
+            Action.RationaleDialogDismissed -> onRationaleDismissed()
+            Action.RationaleDialogConfirmed -> onRationaleConfirmed()
         }
     }
 
@@ -52,7 +58,12 @@ class LocationRequesterScreenViewModel(
             }
 
             else -> {
-                _state.update{ it.copy(updatesRunning = false) }
+                _state.update{
+                    it.copy(
+                        updatesRunning = false,
+                        locationRationaleNeeded = true,
+                    )
+                }
             }
         }
     }
@@ -64,6 +75,7 @@ class LocationRequesterScreenViewModel(
         _state.update {
             it.copy(
                 updatesRunning = true,
+                locationRationaleNeeded = false,
             )
         }
         locationRepository.requestLocationUpdates { locations ->
@@ -73,5 +85,13 @@ class LocationRequesterScreenViewModel(
                 )
             }
         }
+    }
+
+    private fun onRationaleDismissed() {
+        _state.update { it.copy(locationRationaleNeeded = false) }
+    }
+
+    private fun onRationaleConfirmed() {
+        _state.update { it.copy(locationRationaleNeeded = false) }
     }
 }
