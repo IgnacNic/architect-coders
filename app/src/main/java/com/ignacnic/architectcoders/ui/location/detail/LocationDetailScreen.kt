@@ -23,11 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ignacnic.architectcoders.R
 import com.ignacnic.architectcoders.ui.Screen
 import com.ignacnic.architectcoders.ui.location.detail.LocationDetailScreenViewModel.UiState
 import com.ignacnic.architectcoders.ui.location.detail.LocationDetailScreenViewModel.Action
+import com.ignacnic.architectcoders.ui.theme.ArchitectCodersTheme
 
 @Composable
 fun LocationDetailScreen(
@@ -45,8 +47,8 @@ fun LocationDetailScreen(
 @Composable
 private fun DetailContent(
     state: UiState,
-    onBack: () -> Unit,
-    reduce: (action: Action) -> Unit
+    onBack: () -> Unit = {},
+    reduce: (action: Action) -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -102,5 +104,53 @@ private fun DetailContent(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun LoadedDetailPreview() {
+    ArchitectCodersTheme {
+        DetailContent(
+            state = UiState(
+                latitude = "40.42189",
+                longitude = "-3.682189",
+                time = "0",
+                loading = false,
+                elevation = 666.0,
+            ),
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun LoadingDetailPreview() {
+    ArchitectCodersTheme {
+        DetailContent(
+            state = UiState(
+                latitude = "40.42189",
+                longitude = "-3.682189",
+                time = "0",
+                loading = true,
+                elevation = null,
+            ),
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ErrorDetailPreview() {
+    ArchitectCodersTheme {
+        DetailContent(
+            state = UiState(
+                latitude = "40.42189",
+                longitude = "-3.682189",
+                time = "0",
+                loading = false,
+                elevation = null,
+            ),
+        )
     }
 }

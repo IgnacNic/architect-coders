@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.ignacnic.architectcoders.domain.location.LocationRepository
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class LocationRequesterScreenViewModel(
@@ -22,13 +23,13 @@ class LocationRequesterScreenViewModel(
         val updatesRunning: Boolean,
     )
 
-    var state = MutableStateFlow(
+    private val _state = MutableStateFlow(
         UiState(
             locationUpdates = listOf(),
             updatesRunning = false,
         )
     )
-        private set
+    val state = _state.asStateFlow()
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     fun reduceAction(action: Action) {
@@ -40,7 +41,7 @@ class LocationRequesterScreenViewModel(
 
     private fun onStopUpdates() {
         locationRepository.removeLocationUpdates()
-        state.update{ it.copy(updatesRunning = false) }
+        _state.update{ it.copy(updatesRunning = false) }
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
@@ -51,7 +52,7 @@ class LocationRequesterScreenViewModel(
             }
 
             else -> {
-                state.update{ it.copy(updatesRunning = false) }
+                _state.update{ it.copy(updatesRunning = false) }
             }
         }
     }
@@ -60,13 +61,13 @@ class LocationRequesterScreenViewModel(
         anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
     )
     private fun startRequest() {
-        state.update {
+        _state.update {
             it.copy(
                 updatesRunning = true,
             )
         }
         locationRepository.requestLocationUpdates { locations ->
-            state.update {
+            _state.update {
                 it.copy(
                     locationUpdates = it.locationUpdates.plus(locations)
                 )

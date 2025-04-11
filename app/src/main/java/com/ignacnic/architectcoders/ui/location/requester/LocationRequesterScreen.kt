@@ -27,39 +27,29 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.ignacnic.architectcoders.R
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import com.ignacnic.architectcoders.ui.Screen
 import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.Action
 import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.UiState
+import com.ignacnic.architectcoders.ui.theme.ArchitectCodersTheme
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LocationRequesterScreen(
     vm: LocationRequesterScreenViewModel,
     onCardClick: (MyLocation) -> Unit,
 ) {
     val state by vm.state.collectAsState()
+    val reduce = vm::reduceAction
     Screen{
-        RequesterContent(state, vm::reduceAction, onCardClick)
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
-@Composable
-private fun RequesterContent(
-    state: UiState,
-    reduce: (Action) -> Unit,
-    onCardClick: (MyLocation) -> Unit
-) {
-    Scaffold(
-        topBar = {
-            TopAppBar( title = { Text("Find my location") })
-        }
-    ) { innerPadding ->
         val locationPermissionState = rememberMultiplePermissionsState(
             permissions = listOf(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -67,6 +57,23 @@ private fun RequesterContent(
             ),
             onPermissionsResult = { reduce(Action.PermissionResult(it)) },
         )
+        RequesterContent(state, locationPermissionState, reduce, onCardClick)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@Composable
+private fun RequesterContent(
+    state: UiState,
+    locationPermissionState: MultiplePermissionsState,
+    reduce: (Action) -> Unit = {},
+    onCardClick: (MyLocation) -> Unit = {},
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar( title = { Text("Find my location") })
+        }
+    ) { innerPadding ->
         LazyColumn(
             modifier = Modifier.padding(innerPadding)
         ) {
@@ -151,5 +158,61 @@ private fun LocationListItem(
                     .size(40.dp),
             )
         }
+    }
+}
+
+@ExperimentalPermissionsApi
+class MultiplePermissionsStatePreview : MultiplePermissionsState {
+
+    override val allPermissionsGranted: Boolean
+        get() = false
+
+    override val permissions: List<PermissionState>
+        get() = emptyList()
+
+    override val revokedPermissions: List<PermissionState>
+        get() = emptyList()
+
+    override val shouldShowRationale: Boolean
+        get() = true
+
+    override fun launchMultiplePermissionRequest() {
+        // do nothing
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview
+@Composable
+private fun EmptyRequesterPreview() {
+    ArchitectCodersTheme {
+        RequesterContent(
+            UiState(
+                locationUpdates = emptyList(),
+                updatesRunning = false,
+            ),
+            MultiplePermissionsStatePreview(),
+        )
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview
+@Composable
+private fun FilledRequesterPreview() {
+    ArchitectCodersTheme {
+        RequesterContent(
+            UiState(
+                locationUpdates = listOf(
+                    MyLocation(
+                        latitude = "40.42189",
+                        longitude = "-3.682189",
+                        timeStamp = "0",
+                    )
+                ),
+                updatesRunning = true,
+            ),
+            MultiplePermissionsStatePreview(),
+        )
     }
 }
