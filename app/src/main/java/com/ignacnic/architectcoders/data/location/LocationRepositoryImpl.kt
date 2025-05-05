@@ -27,7 +27,15 @@ class LocationRepositoryImpl(context: Context) : LocationRepository {
     override fun requestLocationUpdates(onResult: (List<MyLocation>) -> Unit) {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
-                onResult(result.locations.map { it.toMyLocation() })
+                onResult(
+                    result.locations.fold(mutableListOf(result.locations[0])) { accList, location ->
+                        if (accList.last().distanceTo(location) < accList.last().accuracy){
+                            accList
+                        } else {
+                            accList.apply { add(location) }
+                        }
+                    }.map { it.toMyLocation() }
+                )
             }
         }
         locationCallback?.let {
