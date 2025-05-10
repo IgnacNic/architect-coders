@@ -1,0 +1,116 @@
+package com.ignacnic.architectcoders.ui.requester
+
+import android.Manifest
+import com.ignacnic.architectcoders.domain.location.LocationRepository
+import com.ignacnic.architectcoders.domain.location.MyLocation
+import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel
+import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.Action
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert
+import org.junit.Test
+
+class LocationRequesterScreenViewModelTest {
+
+
+    private val locationRepository = mockk<LocationRepository>(relaxed = true)
+    private val sut = LocationRequesterScreenViewModel(locationRepository)
+
+    @Test
+    fun `SHOULD have initial state WHEN viewModel is initialized`() {
+        sut.state.value.let { state ->
+            Assert.assertEquals(state.locationUpdates, emptyList<MyLocation>())
+            Assert.assertFalse(state.updatesRunning)
+            Assert.assertFalse(state.locationRationaleNeeded)
+        }
+    }
+
+    @Test
+    fun `SHOULD enable rationale WHEN PermissionResult is reduced GIVEN no permissions given`() {
+        sut.reduceAction(Action.PermissionResult(emptyMap()))
+        sut.state.value.let { state ->
+            Assert.assertEquals(state.locationUpdates, emptyList<MyLocation>())
+            Assert.assertFalse(state.updatesRunning)
+            Assert.assertTrue(state.locationRationaleNeeded)
+        }
+    }
+
+    @Test
+    fun `SHOULD enable rationale WHEN PermissionResult is reduced GIVEN permissions were denied`() {
+        sut.reduceAction(Action.PermissionResult(
+            mapOf(Manifest.permission.ACCESS_FINE_LOCATION to false)
+        ))
+        sut.state.value.let { state ->
+            Assert.assertEquals(state.locationUpdates, emptyList<MyLocation>())
+            Assert.assertFalse(state.updatesRunning)
+            Assert.assertTrue(state.locationRationaleNeeded)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `SHOULD have correct states WHEN PermissionResult is reduced GIVEN permissions were accepted`() = runTest {
+        givenLocations(listOf(MOCK_LOCATION))
+        val stateValues = mutableListOf<LocationRequesterScreenViewModel.UiState>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            sut.state.toList(stateValues)
+        }
+        sut.reduceAction(Action.PermissionResult(
+            mapOf(Manifest.permission.ACCESS_FINE_LOCATION to true)
+        ))
+        verify {
+            locationRepository.requestLocationUpdates(any())
+        }
+        stateValues[1].let { state ->
+            Assert.assertTrue(state.updatesRunning)
+            Assert.assertFalse(state.locationRationaleNeeded)
+            Assert.assertEquals(state.locationUpdates, emptyList<MyLocation>())
+        }
+        stateValues[2].let { state ->
+            Assert.assertEquals(state.locationUpdates, listOf(MOCK_LOCATION))
+        }
+    }
+
+    @Test
+    fun `SHOULD remove updates WHEN UpdatesStopped is reduced`() {
+        sut.reduceAction(Action.UpdatesStopped)
+        Assert.assertFalse(sut.state.value.updatesRunning)
+        verify {
+            locationRepository.removeLocationUpdates()
+        }
+    }
+
+    @Test
+    fun `SHOULD update the state WHEN rationale dialog is dismissed`() {
+        sut.reduceAction(Action.PermissionResult(emptyMap()))
+        Assert.assertTrue(sut.state.value.locationRationaleNeeded)
+        sut.reduceAction(Action.RationaleDialogDismissed)
+        Assert.assertFalse(sut.state.value.locationRationaleNeeded)
+    }
+
+    @Test
+    fun `SHOULD update the state WHEN rationale dialog is accepted`() {
+        sut.reduceAction(Action.PermissionResult(emptyMap()))
+        Assert.assertTrue(sut.state.value.locationRationaleNeeded)
+        sut.reduceAction(Action.RationaleDialogConfirmed)
+        Assert.assertFalse(sut.state.value.locationRationaleNeeded)
+    }
+
+    private fun givenLocations(locations: List<MyLocation>) {
+        every {
+            locationRepository.requestLocationUpdates(any())
+        } answers {
+            firstArg<(List<MyLocation>) -> Unit>().invoke(locations)
+        }
+    }
+
+    companion object {
+        val MOCK_LOCATION = MyLocation("test", "test", "test")
+    }
+}

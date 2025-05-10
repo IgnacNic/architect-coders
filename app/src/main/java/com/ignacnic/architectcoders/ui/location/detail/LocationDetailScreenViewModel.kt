@@ -27,7 +27,7 @@ class LocationDetailScreenViewModel(
             latitude = location.latitude,
             longitude = location.longitude,
             time = location.timeStamp,
-            loading = true,
+            loading = false,
             elevation = null,
         )
     )
@@ -35,12 +35,12 @@ class LocationDetailScreenViewModel(
 
 
     sealed interface Action {
-        data object onUiLoad: Action
+        data object OnUiLoad: Action
     }
 
     fun reduceAction(action: Action) {
         when (action) {
-            is Action.onUiLoad -> {
+            is Action.OnUiLoad -> {
                 requestElevation()
             }
         }
