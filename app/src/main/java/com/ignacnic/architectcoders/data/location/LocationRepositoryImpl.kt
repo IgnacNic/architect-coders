@@ -1,14 +1,12 @@
 package com.ignacnic.architectcoders.data.location
 
 import android.Manifest
-import android.content.Context
 import android.os.Looper
 import androidx.annotation.RequiresPermission
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.ignacnic.architectcoders.domain.location.LocationRepository
@@ -16,10 +14,9 @@ import com.ignacnic.architectcoders.domain.location.MyLocation
 import com.ignacnic.architectcoders.domain.location.toMyLocation
 import java.util.concurrent.TimeUnit
 
-class LocationRepositoryImpl(context: Context) : LocationRepository {
-
-    private val locationProvider: FusedLocationProviderClient =
-        LocationServices.getFusedLocationProviderClient(context)
+class LocationRepositoryImpl(
+    private val locationProvider: FusedLocationProviderClient,
+) : LocationRepository {
 
     private var locationCallback: LocationCallback? = null
 
@@ -65,10 +62,12 @@ class LocationRepositoryImpl(context: Context) : LocationRepository {
             )
             .addOnCompleteListener {
                 onResult(
-                    if (it.isSuccessful)
+                    if (it.isSuccessful) {
                         it.result?.toMyLocation()
-                    else
+                    }
+                    else {
                         null
+                    }
                 )
             }
     }
