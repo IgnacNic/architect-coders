@@ -65,7 +65,7 @@ private fun DetailContent(
         }
     ) { paddingValues ->
         LaunchedEffect(null) {
-            reduce(Action.onUiLoad)
+            reduce(Action.OnUiLoad)
         }
         Column(
             modifier = Modifier
