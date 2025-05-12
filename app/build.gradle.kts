@@ -59,7 +59,6 @@ dependencies {
     implementation(libs.localbroadcastmanager)
     implementation(libs.logging.interceptor)
     implementation(libs.okhttp)
-    implementation(libs.org.jacoco.core)
     implementation(libs.play.services.location)
     implementation(libs.retrofit)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
