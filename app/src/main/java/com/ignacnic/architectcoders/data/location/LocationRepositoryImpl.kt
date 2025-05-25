@@ -1,6 +1,7 @@
 package com.ignacnic.architectcoders.data.location
 
 import android.Manifest
+import android.location.Location
 import android.os.Looper
 import androidx.annotation.RequiresPermission
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -12,6 +13,9 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import com.ignacnic.architectcoders.domain.location.LocationRepository
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import com.ignacnic.architectcoders.domain.location.toMyLocation
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import java.util.concurrent.TimeUnit
 
 class LocationRepositoryImpl(
@@ -20,19 +24,13 @@ class LocationRepositoryImpl(
 
     private var locationCallback: LocationCallback? = null
 
+    private var lastLocation: Location? = null
+
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    override fun requestLocationUpdates(onResult: (List<MyLocation>) -> Unit) {
+    override fun startLocationUpdates(): Flow<List<MyLocation>> = callbackFlow {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
-                onResult(
-                    result.locations.fold(mutableListOf(result.locations[0])) { accList, location ->
-                        if (accList.last().distanceTo(location) < accList.last().accuracy){
-                            accList
-                        } else {
-                            accList.apply { add(location) }
-                        }
-                    }.map { it.toMyLocation() }
-                )
+                trySend(result.locations.filterLocations().map { it.toMyLocation() })
             }
         }
         locationCallback?.let {
@@ -45,11 +43,17 @@ class LocationRepositoryImpl(
                 Looper.getMainLooper()
             )
         }
+
+        awaitClose {
+            stopLocationUpdates()
+        }
     }
 
-    override fun removeLocationUpdates() {
+    override fun stopLocationUpdates() {
         locationCallback?.let {
             locationProvider.removeLocationUpdates(it)
+            locationCallback = null
+            lastLocation = null
         }
     }
 
@@ -90,6 +94,6 @@ class LocationRepositoryImpl(
     }
 
     companion object {
-        const val REFRESH_INTERVAL_SECONDS = 3L
+        const val REFRESH_INTERVAL_SECONDS = 5L
     }
 }

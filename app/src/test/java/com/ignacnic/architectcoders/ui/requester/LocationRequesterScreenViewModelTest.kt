@@ -82,7 +82,7 @@ class LocationRequesterScreenViewModelTest {
         sut.reduceAction(Action.UpdatesStopped)
         Assert.assertFalse(sut.state.value.updatesRunning)
         verify {
-            locationRepository.removeLocationUpdates()
+            locationRepository.stopLocationUpdates()
         }
     }
 

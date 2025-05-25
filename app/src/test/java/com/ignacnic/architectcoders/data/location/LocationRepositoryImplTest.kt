@@ -32,7 +32,7 @@ class LocationRepositoryImplTest {
 
     @Test
     fun `SHOULD do nothing WHEN remove updates is called GIVEN location callback is not initialized`() {
-        sut.removeLocationUpdates()
+        sut.stopLocationUpdates()
         verify(exactly = 0) {
             locationClient.removeLocationUpdates(any<LocationCallback>())
         }
@@ -41,7 +41,7 @@ class LocationRepositoryImplTest {
     @Test
     fun `SHOULD call remove updates WHEN remove updates is called GIVEN updates were requested`() {
         sut.requestLocationUpdates {}
-        sut.removeLocationUpdates()
+        sut.stopLocationUpdates()
         verify { locationClient.removeLocationUpdates(any<LocationCallback>()) }
     }
 
