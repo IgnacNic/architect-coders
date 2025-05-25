@@ -72,6 +72,23 @@ class LocationRepositoryImpl(
             }
     }
 
+    private fun List<Location>.filterLocations(): List<Location> {
+        val startingVal = lastLocation ?: this[0]
+        return fold(mutableListOf(startingVal)) { acc, location ->
+            if (acc.last().hasAccuracy() && acc.last().distanceTo(location)/2 < acc.last().accuracy){
+                acc
+            } else {
+                acc.apply { add(location) }
+            }
+        }.apply {
+            if (lastLocation != null) {
+                removeAt(0)
+            } else {
+                lastLocation = last()
+            }
+        }
+    }
+
     companion object {
         const val REFRESH_INTERVAL_SECONDS = 3L
     }
