@@ -5,13 +5,19 @@ import com.ignacnic.architectcoders.domain.location.LocationRepository
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel
 import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.Action
+import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.just
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Test
@@ -21,6 +27,7 @@ class LocationRequesterScreenViewModelTest {
 
     private val locationRepository = mockk<LocationRepository>(relaxed = true)
     private val sut = LocationRequesterScreenViewModel(locationRepository)
+    private val locationFlow = MutableStateFlow(emptyList<MyLocation>())
 
     @Test
     fun `SHOULD have initial state WHEN viewModel is initialized`() {
@@ -65,7 +72,7 @@ class LocationRequesterScreenViewModelTest {
             mapOf(Manifest.permission.ACCESS_FINE_LOCATION to true)
         ))
         verify {
-            locationRepository.requestLocationUpdates(any())
+            locationRepository.startLocationUpdates()
         }
         stateValues[1].let { state ->
             Assert.assertTrue(state.updatesRunning)
@@ -82,7 +89,7 @@ class LocationRequesterScreenViewModelTest {
         sut.reduceAction(Action.UpdatesStopped)
         Assert.assertFalse(sut.state.value.updatesRunning)
         verify {
-            locationRepository.removeLocationUpdates()
+            locationRepository.stopLocationUpdates()
         }
     }
 
@@ -102,11 +109,14 @@ class LocationRequesterScreenViewModelTest {
         Assert.assertFalse(sut.state.value.locationRationaleNeeded)
     }
 
-    private fun givenLocations(locations: List<MyLocation>) {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun TestScope.givenLocations(locations: List<MyLocation>) {
         every {
-            locationRepository.requestLocationUpdates(any())
-        } answers {
-            firstArg<(List<MyLocation>) -> Unit>().invoke(locations)
+            locationRepository.startLocationUpdates()
+        } returns locationFlow.also { flow ->
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                flow.emit(locations)
+            }
         }
     }
 

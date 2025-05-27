@@ -3,11 +3,13 @@ package com.ignacnic.architectcoders.ui.location.requester
 import android.Manifest
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ignacnic.architectcoders.domain.location.LocationRepository
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class LocationRequesterScreenViewModel(
     private val locationRepository: LocationRepository
@@ -46,7 +48,7 @@ class LocationRequesterScreenViewModel(
     }
 
     private fun onStopUpdates() {
-        locationRepository.removeLocationUpdates()
+        locationRepository.stopLocationUpdates()
         _state.update{ it.copy(updatesRunning = false) }
     }
 
@@ -78,11 +80,13 @@ class LocationRequesterScreenViewModel(
                 locationRationaleNeeded = false,
             )
         }
-        locationRepository.requestLocationUpdates { locations ->
-            _state.update {
-                it.copy(
-                    locationUpdates = it.locationUpdates.plus(locations)
-                )
+        viewModelScope.launch {
+            locationRepository.startLocationUpdates().collect { locations ->
+                _state.update {
+                    it.copy(
+                        locationUpdates = it.locationUpdates.plus(locations)
+                    )
+                }
             }
         }
     }
