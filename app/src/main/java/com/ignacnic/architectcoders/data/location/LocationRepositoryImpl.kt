@@ -22,7 +22,7 @@ class LocationRepositoryImpl(
     private val locationProvider: FusedLocationProviderClient,
 ) : LocationRepository {
 
-    private var locationCallback: LocationCallback? = null
+    internal var locationCallback: LocationCallback? = null
 
     private var lastLocation: Location? = null
 
@@ -77,9 +77,14 @@ class LocationRepositoryImpl(
     }
 
     private fun List<Location>.filterLocations(): List<Location> {
-        val startingVal = lastLocation ?: this[0]
-        return fold(mutableListOf(startingVal)) { acc, location ->
-            if (acc.last().hasAccuracy() && acc.last().distanceTo(location)/2 < acc.last().accuracy){
+        val startingVal = lastLocation?: get(0)
+        val startingIdx = if (lastLocation != null) -1 else 0
+        return foldIndexed(mutableListOf(startingVal)) { i, acc, location ->
+            if (
+                startingIdx == i
+                || acc.last().hasAccuracy()
+                && acc.last().distanceTo(location)/2 < acc.last().accuracy
+            ){
                 acc
             } else {
                 acc.apply { add(location) }
