@@ -5,10 +5,7 @@ import com.ignacnic.architectcoders.domain.location.LocationRepository
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel
 import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.Action
-import io.mockk.coEvery
 import io.mockk.every
-import io.mockk.just
-import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,10 +14,10 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Test
+import kotlin.test.assertFailsWith
 
 class LocationRequesterScreenViewModelTest {
 
@@ -107,6 +104,18 @@ class LocationRequesterScreenViewModelTest {
         Assert.assertTrue(sut.state.value.locationRationaleNeeded)
         sut.reduceAction(Action.RationaleDialogConfirmed)
         Assert.assertFalse(sut.state.value.locationRationaleNeeded)
+    }
+
+    @Test
+    fun `SHOULD fail with Illegal State WHEN start location updates GIVEN they already started`() {
+        sut.reduceAction(Action.PermissionResult(
+            mapOf(Manifest.permission.ACCESS_FINE_LOCATION to true))
+        )
+        assertFailsWith<IllegalStateException> {
+            sut.reduceAction(Action.PermissionResult(
+                mapOf(Manifest.permission.ACCESS_FINE_LOCATION to true))
+            )
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

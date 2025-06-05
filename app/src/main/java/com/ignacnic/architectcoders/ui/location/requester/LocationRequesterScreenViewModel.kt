@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ignacnic.architectcoders.domain.location.LocationRepository
 import com.ignacnic.architectcoders.domain.location.MyLocation
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -36,6 +37,7 @@ class LocationRequesterScreenViewModel(
         )
     )
     val state = _state.asStateFlow()
+    private var locationUpdatesJob: Job? = null
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     fun reduceAction(action: Action) {
@@ -50,6 +52,10 @@ class LocationRequesterScreenViewModel(
     private fun onStopUpdates() {
         locationRepository.stopLocationUpdates()
         _state.update{ it.copy(updatesRunning = false) }
+        locationUpdatesJob?.let {
+            it.cancel()
+            locationUpdatesJob = null
+        }
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
@@ -74,13 +80,14 @@ class LocationRequesterScreenViewModel(
         anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
     )
     private fun startRequest() {
+        locationUpdatesJob?.run { throw IllegalStateException("Location updates are already running") }
         _state.update {
             it.copy(
                 updatesRunning = true,
                 locationRationaleNeeded = false,
             )
         }
-        viewModelScope.launch {
+        locationUpdatesJob = viewModelScope.launch {
             locationRepository.startLocationUpdates().collect { locations ->
                 _state.update {
                     it.copy(
