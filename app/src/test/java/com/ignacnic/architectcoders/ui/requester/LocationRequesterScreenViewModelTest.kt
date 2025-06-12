@@ -133,7 +133,7 @@ class LocationRequesterScreenViewModelTest {
     }
 
     @Test
-    fun `SHOULD hide trash dialog and delete updates WHEN TrashDialogDismissed`() = runTest {
+    fun `SHOULD hide trash dialog and delete updates WHEN TrashUpdatesConfirmed`() = runTest {
         givenLocations(listOf(MOCK_LOCATION))
         sut.reduceAction(Action.PermissionResult(
             mapOf(Manifest.permission.ACCESS_FINE_LOCATION to true)
