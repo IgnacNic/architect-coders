@@ -118,6 +118,38 @@ class LocationRequesterScreenViewModelTest {
         }
     }
 
+    @Test
+    fun `SHOULD show trash dialog WHEN TrashUpdatesRequested`() {
+        sut.reduceAction(Action.TrashUpdatesRequested)
+        Assert.assertTrue(sut.state.value.updatesTrashRequested)
+    }
+
+    @Test
+    fun `SHOULD hide trash dialog WHEN TrashDialogDismissed`() {
+        sut.reduceAction(Action.TrashUpdatesRequested)
+        Assert.assertTrue(sut.state.value.updatesTrashRequested)
+        sut.reduceAction(Action.TrashDialogDismissed)
+        Assert.assertFalse(sut.state.value.updatesTrashRequested)
+    }
+
+    @Test
+    fun `SHOULD hide trash dialog and delete updates WHEN TrashDialogDismissed`() = runTest {
+        givenLocations(listOf(MOCK_LOCATION))
+        sut.reduceAction(Action.PermissionResult(
+            mapOf(Manifest.permission.ACCESS_FINE_LOCATION to true)
+        ))
+        sut.reduceAction(Action.TrashUpdatesRequested)
+        sut.reduceAction(Action.TrashUpdatesConfirmed)
+        sut.state.value.run {
+            Assert.assertFalse(updatesRunning)
+            Assert.assertFalse(updatesTrashRequested)
+            Assert.assertEquals(locationUpdates, emptyList<MyLocation>())
+        }
+        verify {
+            locationRepository.stopLocationUpdates()
+        }
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun TestScope.givenLocations(locations: List<MyLocation>) {
         every {

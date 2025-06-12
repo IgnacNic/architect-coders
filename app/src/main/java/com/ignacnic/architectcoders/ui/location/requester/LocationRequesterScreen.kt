@@ -12,13 +12,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -27,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -77,7 +81,7 @@ private fun RequesterContent(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar( title = { Text("Find my location") })
+            TopAppBar( title = { Text(stringResource(R.string.record_screen_title)) })
         }
     ) { innerPadding ->
         if (state.locationRationaleNeeded) {
@@ -87,36 +91,29 @@ private fun RequesterContent(
                     context.startActivity(
                         Intent(
                             ACTION_APPLICATION_DETAILS_SETTINGS,
-                            Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                            Uri.fromParts(
+                                "package",
+                                BuildConfig.APPLICATION_ID,
+                                null,
+                            )
                         )
                     )
                 },
                 onDismiss = { reduce(Action.RationaleDialogDismissed) },
             )
+        } else if (state.updatesTrashRequested) {
+            TrashUpdatesDialog(reduce)
         }
         LazyColumn(
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         ) {
             item {
-                Row(
+                LocationUpdatesControlButtons(
+                    state = state,
+                    reduce = reduce,
+                    locationPermissionState = locationPermissionState,
                     modifier = Modifier.padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Receive Location Updates",
-                        modifier = Modifier.padding(end = 12.dp)
-                    )
-                    Switch(
-                        checked = state.updatesRunning,
-                        onCheckedChange = { checked ->
-                            if (checked) {
-                                locationPermissionState.launchMultiplePermissionRequest()
-                            } else {
-                                reduce(Action.UpdatesStopped)
-                            }
-                        }
-                    )
-                }
+                )
             }
             items(state.locationUpdates) { item ->
                 LocationListItem(
@@ -124,6 +121,66 @@ private fun RequesterContent(
                     onCardClick = onCardClick,
                 )
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun LocationUpdatesControlButtons(
+    state: UiState,
+    reduce: (Action) -> Unit,
+    locationPermissionState: MultiplePermissionsState,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(Modifier.weight(1f)) {
+            IconButton(
+                onClick = {
+                    locationPermissionState.launchMultiplePermissionRequest()
+                },
+                enabled = !state.updatesRunning,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_play),
+                    contentDescription = stringResource(R.string.play),
+                )
+            }
+            IconButton(
+                onClick = {
+                    reduce(Action.UpdatesStopped)
+                },
+                enabled = state.updatesRunning,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_pause),
+                    contentDescription = stringResource(R.string.pause),
+                )
+            }
+            IconButton(
+                onClick = {},
+                enabled = state.locationUpdates.isNotEmpty(),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_save),
+                    contentDescription = stringResource(R.string.save),
+                )
+            }
+        }
+        IconButton(
+            onClick = {
+                reduce(Action.TrashUpdatesRequested)
+            },
+            enabled = state.locationUpdates.isNotEmpty(),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_trash),
+                contentDescription = stringResource(R.string.delete),
+            )
         }
     }
 }
@@ -183,6 +240,32 @@ private fun LocationListItem(
     }
 }
 
+@Composable
+private fun TrashUpdatesDialog(
+    reduce: (Action) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AlertDialog(
+        modifier = modifier,
+        text = {
+            Text(text = stringResource(R.string.trash_dialog_text))
+        },
+        onDismissRequest = {
+            reduce(Action.TrashDialogDismissed)
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { reduce(Action.TrashUpdatesConfirmed) },
+            ) { Text(stringResource(R.string.generic_delete)) }
+        },
+        dismissButton = {
+            Button(
+                onClick = { reduce(Action.TrashDialogDismissed) },
+            ) { Text(stringResource(R.string.generic_cancel)) }
+        },
+    )
+}
+
 @ExperimentalPermissionsApi
 class MultiplePermissionsStatePreview : MultiplePermissionsState {
 
@@ -213,6 +296,7 @@ private fun EmptyRequesterPreview() {
                 locationUpdates = emptyList(),
                 updatesRunning = false,
                 locationRationaleNeeded = false,
+                updatesTrashRequested = false,
             ),
             MultiplePermissionsStatePreview(),
         )
@@ -229,6 +313,7 @@ private fun DialogRequesterPreview() {
                 locationUpdates = emptyList(),
                 updatesRunning = false,
                 locationRationaleNeeded = true,
+                updatesTrashRequested = false,
             ),
             MultiplePermissionsStatePreview(),
         )
@@ -251,6 +336,30 @@ private fun FilledRequesterPreview() {
                 ),
                 updatesRunning = true,
                 locationRationaleNeeded = false,
+                updatesTrashRequested = false,
+            ),
+            MultiplePermissionsStatePreview(),
+        )
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview
+@Composable
+private fun TrashRequestedPreview() {
+    ArchitectCodersTheme {
+        RequesterContent(
+            UiState(
+                locationUpdates = listOf(
+                    MyLocation(
+                        latitude = "40.42189",
+                        longitude = "-3.682189",
+                        timeStamp = "0",
+                    )
+                ),
+                updatesRunning = true,
+                locationRationaleNeeded = false,
+                updatesTrashRequested = true,
             ),
             MultiplePermissionsStatePreview(),
         )

@@ -21,12 +21,16 @@ class LocationRequesterScreenViewModel(
         data object UpdatesStopped: Action
         data object RationaleDialogDismissed: Action
         data object RationaleDialogConfirmed: Action
+        data object TrashDialogDismissed : Action
+        data object TrashUpdatesConfirmed : Action
+        data object TrashUpdatesRequested : Action
     }
 
     data class UiState(
         val locationUpdates: List<MyLocation>,
         val updatesRunning: Boolean,
         val locationRationaleNeeded: Boolean,
+        val updatesTrashRequested: Boolean,
     )
 
     private val _state = MutableStateFlow(
@@ -34,6 +38,7 @@ class LocationRequesterScreenViewModel(
             locationUpdates = listOf(),
             updatesRunning = false,
             locationRationaleNeeded = false,
+            updatesTrashRequested = false,
         )
     )
     val state = _state.asStateFlow()
@@ -46,6 +51,9 @@ class LocationRequesterScreenViewModel(
             Action.UpdatesStopped -> onStopUpdates()
             Action.RationaleDialogDismissed -> onRationaleDismissed()
             Action.RationaleDialogConfirmed -> onRationaleConfirmed()
+            Action.TrashDialogDismissed -> onTrashDialogDismissed()
+            Action.TrashUpdatesRequested -> onTrashUpdatesRequested()
+            Action.TrashUpdatesConfirmed -> onTrashUpdatesConfirmed()
         }
     }
 
@@ -104,5 +112,24 @@ class LocationRequesterScreenViewModel(
 
     private fun onRationaleConfirmed() {
         _state.update { it.copy(locationRationaleNeeded = false) }
+    }
+
+    private fun onTrashDialogDismissed() {
+        _state.update { it.copy(updatesTrashRequested = false) }
+    }
+
+    private fun onTrashUpdatesRequested() {
+        _state.update { it.copy(updatesTrashRequested = true) }
+    }
+
+    private fun onTrashUpdatesConfirmed() {
+        locationRepository.stopLocationUpdates()
+        _state.update {
+            it.copy(
+                updatesTrashRequested = false,
+                updatesRunning = false,
+                locationUpdates = emptyList(),
+            )
+        }
     }
 }
