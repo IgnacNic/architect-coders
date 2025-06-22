@@ -115,8 +115,8 @@ class LocationRepositoryImplTest {
             },
         )
         private val MYLOCATION_EXPECTED_NO_ACC = listOf(
-            MyLocation("1.0", "2.0", "0"),
-            MyLocation("1.0", "2.0", "1"),
+            MyLocation("1.0", "2.0", "0", ""),
+            MyLocation("1.0", "2.0", "1", ""),
         )
         private val LOCATION_LIST_WITH_ACC = listOf(
             Location("").apply {
@@ -133,7 +133,7 @@ class LocationRepositoryImplTest {
             },
         )
         private val MYLOCATION_EXPECTED = listOf(
-            MyLocation("1.0", "2.0", "0"),
+            MyLocation("1.0", "2.0", "0", ""),
         )
     }
 }
