@@ -1,6 +1,5 @@
 package com.ignacnic.architectcoders.ui.location.requester
 
-import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -40,34 +39,77 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.ignacnic.architectcoders.BuildConfig
 import com.ignacnic.architectcoders.R
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import com.ignacnic.architectcoders.ui.Screen
 import com.ignacnic.architectcoders.ui.location.LocationRationaleDialog
 import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.Action
+import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.SideEffect
 import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.UiState
 import com.ignacnic.architectcoders.ui.theme.ArchitectCodersTheme
+import com.ignacnic.architectcoders.ui.utils.CollectSideEffect
+import com.ignacnic.architectcoders.ui.utils.rememberDocumentPickerActivityLauncher
+import com.ignacnic.architectcoders.ui.utils.rememberDocumentTreeActivityLauncher
+import com.ignacnic.architectcoders.ui.utils.rememberFineLocationPermissionsState
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
 
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LocationRequesterScreen(
     vm: LocationRequesterScreenViewModel,
-    onCardClick: (MyLocation) -> Unit,
+    onNavigationEffect: (SideEffect) -> Unit,
 ) {
     val state by vm.state.collectAsState()
     val reduce = vm::reduceAction
+    val context = LocalContext.current
+    val locationPermissionState = rememberFineLocationPermissionsState {
+        reduce(Action.PermissionResult(it))
+    }
+    val documentTreeLauncher = rememberDocumentTreeActivityLauncher { result ->
+        reduce(Action.FileDirectoryPicked(result))
+    }
+    val documentPickerLauncher = rememberDocumentPickerActivityLauncher { result ->
+        reduce(Action.FileCreated(result))
+    }
     Screen{
-        val locationPermissionState = rememberMultiplePermissionsState(
-            permissions = listOf(
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-            ),
-            onPermissionsResult = { reduce(Action.PermissionResult(it)) },
-        )
-        RequesterContent(state, locationPermissionState, reduce, onCardClick)
+        RequesterContent(state, locationPermissionState, reduce)
+    }
+    CollectSideEffect(vm.sideEffects) { sideEffect ->
+        when (sideEffect) {
+            is SideEffect.LaunchAppDetailsSettings -> {
+                context.startActivity(
+                    Intent(
+                        ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.fromParts(
+                            "package",
+                            BuildConfig.APPLICATION_ID,
+                            null,
+                        )
+                    )
+                )
+            }
+
+            is SideEffect.LaunchDirectoryPicker -> documentTreeLauncher.launch(null)
+            is SideEffect.NavigateToLocationDetails -> onNavigationEffect(sideEffect)
+            is SideEffect.LaunchFilePicker -> documentPickerLauncher.launch(sideEffect.uri)
+
+            is SideEffect.WriteToFile -> {
+                try {
+                    context.contentResolver.openFileDescriptor(sideEffect.uri, "w").use {
+                        FileOutputStream(it?.fileDescriptor).use { outputStream ->
+                            outputStream.write(
+                                sideEffect.content.toByteArray()
+                            )
+                        }
+                    }
+                } catch (e: FileNotFoundException) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 }
 
@@ -77,7 +119,6 @@ private fun RequesterContent(
     state: UiState,
     locationPermissionState: MultiplePermissionsState,
     reduce: (Action) -> Unit = {},
-    onCardClick: (MyLocation) -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -85,20 +126,8 @@ private fun RequesterContent(
         }
     ) { innerPadding ->
         if (state.locationRationaleNeeded) {
-            val context = LocalContext.current
             LocationRationaleDialog(
-                onAccept = {
-                    context.startActivity(
-                        Intent(
-                            ACTION_APPLICATION_DETAILS_SETTINGS,
-                            Uri.fromParts(
-                                "package",
-                                BuildConfig.APPLICATION_ID,
-                                null,
-                            )
-                        )
-                    )
-                },
+                onAccept = { reduce(Action.RationaleDialogConfirmed) },
                 onDismiss = { reduce(Action.RationaleDialogDismissed) },
             )
         } else if (state.updatesTrashRequested) {
@@ -118,7 +147,9 @@ private fun RequesterContent(
             items(state.locationUpdates) { item ->
                 LocationListItem(
                     item = item,
-                    onCardClick = onCardClick,
+                    onCardClick = { location ->
+                        reduce(Action.CardClicked(location))
+                    },
                 )
             }
         }
@@ -162,7 +193,9 @@ private fun LocationUpdatesControlButtons(
                 )
             }
             IconButton(
-                onClick = {},
+                onClick = {
+                    reduce(Action.SaveRoute)
+                },
                 enabled = state.locationUpdates.isNotEmpty(),
             ) {
                 Icon(
@@ -332,6 +365,7 @@ private fun FilledRequesterPreview() {
                         latitude = "40.42189",
                         longitude = "-3.682189",
                         timeStamp = "0",
+                        elevation = "666.0"
                     )
                 ),
                 updatesRunning = true,
@@ -355,6 +389,7 @@ private fun TrashRequestedPreview() {
                         latitude = "40.42189",
                         longitude = "-3.682189",
                         timeStamp = "0",
+                        elevation = "666.0"
                     )
                 ),
                 updatesRunning = true,
