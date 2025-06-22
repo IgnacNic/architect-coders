@@ -10,13 +10,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.ignacnic.architectcoders.data.elevationRepository
+import com.ignacnic.architectcoders.data.gpxFileRepository
 import com.ignacnic.architectcoders.data.locationRepository
+import com.ignacnic.architectcoders.data.userPreferencesRepository
 import com.ignacnic.architectcoders.domain.location.MyLocation
 import com.ignacnic.architectcoders.domain.location.MyLocationType
 import com.ignacnic.architectcoders.ui.location.detail.LocationDetailScreen
 import com.ignacnic.architectcoders.ui.location.detail.LocationDetailScreenViewModel
 import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreen
 import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel
+import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.SideEffect.NavigateToLocationDetails
 import kotlin.reflect.typeOf
 
 class MainActivity : ComponentActivity() {
@@ -28,11 +31,17 @@ class MainActivity : ComponentActivity() {
             NavHost(navController, startDestination = Screens.LocationRequester) {
                 composable<Screens.LocationRequester> {
                     LocationRequesterScreen(
-                        vm = viewModel { LocationRequesterScreenViewModel(locationRepository) },
-                        onCardClick = { location ->
-                            navController.navigate(
-                                Screens.LocationDetail(location = location)
-                            )
+                        vm = viewModel { LocationRequesterScreenViewModel(
+                            locationRepository,
+                            userPreferencesRepository,
+                            gpxFileRepository,
+                        ) },
+                        onNavigationEffect = { effect ->
+                            if (effect is NavigateToLocationDetails) {
+                                navController.navigate(
+                                    Screens.LocationDetail(location = effect.location)
+                                )
+                            }
                         },
                     )
                 }
