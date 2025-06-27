@@ -21,3 +21,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "ArchitectCoders"
 include(":app")
+include(":feature:location")
+include(":domain:elevation")
+include(":domain:location")
+include(":common:entities")
+include(":domain:user-preferences")
+include(":domain:gpx-file")
+include(":common:ui-resources")
