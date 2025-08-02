@@ -1,6 +1,5 @@
 package com.ignacnic.convention
 
-import com.android.build.api.dsl.LibraryExtension
 import com.ignacnic.convention.utils.libs
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
@@ -11,7 +10,6 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import kotlin.apply
 
 class KotlinLibraryConventionPlugin : Plugin<Project> {
     override fun apply(project: Project) {

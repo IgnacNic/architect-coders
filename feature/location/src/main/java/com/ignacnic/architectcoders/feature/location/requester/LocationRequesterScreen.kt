@@ -51,8 +51,6 @@ import com.ignacnic.architectcoders.entities.location.MyLocation
 import com.ignacnic.architectcoders.feature.location.requester.LocationRequesterScreenViewModel.Action
 import com.ignacnic.architectcoders.feature.location.requester.LocationRequesterScreenViewModel.SideEffect
 import com.ignacnic.architectcoders.feature.location.requester.LocationRequesterScreenViewModel.UiState
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
 
 
 @OptIn(ExperimentalPermissionsApi::class)

@@ -221,7 +221,7 @@ class LocationRequesterScreenViewModelTest {
         runTest {
             val storedUri = "test"
             val expectedUri = mockk<Uri>()
-            mockkStatic(android.net.Uri::class)
+            mockkStatic(Uri::class)
             every { storedUri.toUri() } returns expectedUri
             every { userPreferencesRepository.getString(any(), any()) } returns storedUri
             val testDispatcher = UnconfinedTestDispatcher(testScheduler)
