@@ -20,3 +20,4 @@ The project is divided in four modules: `app`, `feature`, `business-logic` and `
 - `business-logic` Module: Both **Data** and **Domain** layer. Each submodule here is also independent from each other and are broken into a package for each layer.
 - `common` Module: Under this module are the common tools that both `feature` and `business-logic` modules may use. They include project's entities, ui resources, networking utils, et cetera.
 
+<img width="442" height="622" alt="architecture" src="https://github.com/user-attachments/assets/f73f04c1-eb69-4924-a068-cc1789b2d3a4" />
