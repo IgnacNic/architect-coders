@@ -3,9 +3,10 @@ package com.ignacnic.architectcoders.feature.location.requester
 import android.Manifest
 import android.net.Uri
 import androidx.core.net.toUri
-import com.ignacnic.architectcoders.domain.gpxfile.domain.GPXFileRepository
-import com.ignacnic.architectcoders.domain.location.domain.LocationRepository
-import com.ignacnic.architectcoders.domain.userpreferences.domain.UserPreferencesRepository
+import com.ignacnic.architectcoders.common.filemanager.usecases.WriteToFileUseCase
+import com.ignacnic.architectcoders.businesslogic.gpxfile.domain.GPXFileRepository
+import com.ignacnic.architectcoders.businesslogic.location.domain.LocationRepository
+import com.ignacnic.architectcoders.businesslogic.userpreferences.domain.UserPreferencesRepository
 import com.ignacnic.architectcoders.entities.buildconfig.BuildConfigFieldsProvider
 import com.ignacnic.architectcoders.entities.location.MyLocation
 import com.ignacnic.architectcoders.feature.location.requester.LocationRequesterScreenViewModel.Action
@@ -35,11 +36,13 @@ class LocationRequesterScreenViewModelTest {
     private val userPreferencesRepository = mockk<UserPreferencesRepository>(relaxed = true)
     private val gpxFileRepository = mockk<GPXFileRepository>(relaxed = true)
     private val buildConfigFieldsProvider = mockk<BuildConfigFieldsProvider>(relaxed = true)
+    private val writeToFileUseCase = mockk<WriteToFileUseCase>(relaxed = true)
     private val sut = LocationRequesterScreenViewModel(
         locationRepository,
         userPreferencesRepository,
         gpxFileRepository,
-        buildConfigFieldsProvider
+        buildConfigFieldsProvider,
+        writeToFileUseCase,
     )
     private val locationFlow = MutableStateFlow(emptyList<MyLocation>())
 
@@ -277,11 +280,7 @@ class LocationRequesterScreenViewModelTest {
         }
 
         sut.reduceAction(Action.FileCreated(expectedUri))
-        sideEffectValues.last().run {
-            Assert.assertTrue(this is SideEffect.WriteToFile)
-            Assert.assertEquals((this as SideEffect.WriteToFile).uri, expectedUri)
-            Assert.assertEquals(this.content, "test")
-        }
+        verify { writeToFileUseCase.invoke(expectedUri, "test".toByteArray()) }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

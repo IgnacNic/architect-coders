@@ -2,7 +2,7 @@ package com.ignacnic.architectcoders.feature.location.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ignacnic.architectcoders.domain.elevation.domain.ElevationRepository
+import com.ignacnic.architectcoders.businesslogic.elevation.domain.ElevationRepository
 import com.ignacnic.architectcoders.entities.location.MyLocation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

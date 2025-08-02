@@ -91,20 +91,6 @@ fun LocationRequesterScreen(
             is SideEffect.LaunchDirectoryPicker -> documentTreeLauncher.launch(null)
             is SideEffect.NavigateToLocationDetails -> onNavigationEffect(sideEffect)
             is SideEffect.LaunchFilePicker -> documentPickerLauncher.launch(sideEffect.uri)
-
-            is SideEffect.WriteToFile -> {
-                try {
-                    context.contentResolver.openFileDescriptor(sideEffect.uri, "w").use {
-                        FileOutputStream(it?.fileDescriptor).use { outputStream ->
-                            outputStream.write(
-                                sideEffect.content.toByteArray()
-                            )
-                        }
-                    }
-                } catch (e: FileNotFoundException) {
-                    e.printStackTrace()
-                }
-            }
         }
     }
 

@@ -1,4 +1,6 @@
 pluginManagement {
+    includeBuild("build-logic")
+
     repositories {
         google {
             content {
@@ -21,10 +23,11 @@ dependencyResolutionManagement {
 
 rootProject.name = "ArchitectCoders"
 include(":app")
-include(":feature:location")
-include(":domain:elevation")
-include(":domain:location")
 include(":common:entities")
-include(":domain:user-preferences")
-include(":domain:gpx-file")
+include(":common:file-manager")
 include(":common:ui-resources")
+include(":business-logic:elevation")
+include(":business-logic:gpx-file")
+include(":business-logic:location")
+include(":business-logic:user-preferences")
+include(":feature:location")

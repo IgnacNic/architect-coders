@@ -6,10 +6,11 @@ import androidx.annotation.RequiresPermission
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ignacnic.architectcoders.domain.gpxfile.domain.GPXFileRepository
-import com.ignacnic.architectcoders.domain.location.domain.LocationRepository
-import com.ignacnic.architectcoders.domain.userpreferences.domain.PreferencesKeys
-import com.ignacnic.architectcoders.domain.userpreferences.domain.UserPreferencesRepository
+import com.ignacnic.architectcoders.common.filemanager.usecases.WriteToFileUseCase
+import com.ignacnic.architectcoders.businesslogic.gpxfile.domain.GPXFileRepository
+import com.ignacnic.architectcoders.businesslogic.location.domain.LocationRepository
+import com.ignacnic.architectcoders.businesslogic.userpreferences.domain.PreferencesKeys
+import com.ignacnic.architectcoders.businesslogic.userpreferences.domain.UserPreferencesRepository
 import com.ignacnic.architectcoders.entities.buildconfig.BuildConfigFieldsProvider
 import com.ignacnic.architectcoders.entities.location.MyLocation
 import kotlinx.coroutines.Job
@@ -26,6 +27,7 @@ class LocationRequesterScreenViewModel(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val gpxFileRepository: GPXFileRepository,
     private val buildConfigFieldsProvider: BuildConfigFieldsProvider,
+    private val writeToFile: WriteToFileUseCase,
 ) : ViewModel(){
 
     sealed interface Action {
@@ -54,7 +56,6 @@ class LocationRequesterScreenViewModel(
         data class LaunchAppDetailsSettings(val appId: String) : SideEffect
         data object LaunchDirectoryPicker : SideEffect
         data class LaunchFilePicker(val uri: Uri) : SideEffect
-        data class WriteToFile(val uri: Uri, val content: String) : SideEffect
     }
 
     private val _state = MutableStateFlow(
@@ -204,9 +205,7 @@ class LocationRequesterScreenViewModel(
             locations = state.value.locationUpdates,
             fileName = uri.lastPathSegment ?: "",
         )
-        viewModelScope.launch {
-            _sideEffects.send(SideEffect.WriteToFile(uri, content))
-        }
+        writeToFile(uri, content.toByteArray())
     }
 
     private fun onLocationCardClicked(location: MyLocation) {

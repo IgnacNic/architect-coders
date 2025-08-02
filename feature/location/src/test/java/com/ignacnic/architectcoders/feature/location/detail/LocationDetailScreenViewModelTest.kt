@@ -1,6 +1,6 @@
 package com.ignacnic.architectcoders.feature.location.detail
 
-import com.ignacnic.architectcoders.domain.elevation.domain.ElevationRepository
+import com.ignacnic.architectcoders.businesslogic.elevation.domain.ElevationRepository
 import com.ignacnic.architectcoders.entities.location.MyLocation
 import com.ignacnic.architectcoders.feature.location.CoroutinesTestRule
 import io.mockk.coEvery
@@ -81,9 +81,9 @@ class LocationDetailScreenViewModelTest {
     private fun assertEqualsInitialState(state: LocationDetailScreenViewModel.UiState) {
         Assert.assertFalse(state.loading)
         Assert.assertNull(state.elevation)
-        Assert.assertEquals(state.latitude, MOCK_LAT)
-        Assert.assertEquals(state.longitude, MOCK_LON)
-        Assert.assertEquals(state.time, MOCK_TS)
+        Assert.assertEquals(state.latitude, MOCK_LAT.toString())
+        Assert.assertEquals(state.longitude, MOCK_LON.toString())
+        Assert.assertEquals(state.time, MOCK_TS.toString())
     }
 
     private fun assertEqualsFinalSuccessState(

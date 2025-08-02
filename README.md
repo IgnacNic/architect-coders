@@ -1,37 +1,22 @@
-# architect-coders
-Repository to manage Ignacio Nicolas app's development during the architects coders Course
+# ArchitectCoders App
 
-This Branch contains the first practical task of the course.
+This app was started as the project attached to the learning course of Architect Coders. The development follows the cycles described in a custom Jira project created solely for this app: [Architect Coders Project](https://inicolaslop.atlassian.net/jira/software/projects/ACP/boards/1)
 
-## About the App
-This app is a very simple implementation of the usage of the Location Google Play services. It is
-composed of two screens.
 
-### Screens
-The first screen `LocationRequesterScreen` is there to fetch in the foreground the current location
-of the user, displaying it in a list with some basic information. If the user clicks on any of the
-displayed location they will be directed to the second screen.
+## Branching
 
-The second screen `LocationDetailScreen` will display the selected location in a detailed view. As 
-the screen is loading the app will attempt to request that location's height from the sea level.
-That is achieved through an HTTP request to an elevation API.
+The branching strategy for the project is as follows:
 
-### ViewModels
-Both screens count with their individual view models in charge of processing the user inputs and
-making changes to the Screen's state. They are as of this version being instantiated in the
-`MainActivity` navigation Graph, with their parameters being injected through a homebrew dependency
-injection.
+1. All branches must start with a prefix from the following: `feature` or `practicas` depending on the Jira issue type they are linked to.
+2. All branches must then have their respective ticket number from the `ACP` project e.g.: `feature/ACP-11/...`. For the branches under `practicas`, they must have only the numeral version of the release made for review, such as `practicas/practica_1`.
+3. Lastly, branches under `feature` must end with a short explanatory name, for example: `feature/ACP-18/location-updates-flows`.
 
-### Repositories
-For fetching the Location the app uses an implementation of the `LocationRepository`, which can
-control location updates through its `requestLocationUpdates`, and receive them through a callback
-lambda, `removeLocationUpdates` methods as well as request a single one through `requestSingleLocation`.
+## Architecture
+When deciding the project's architecture I opted for a mixed approach of Clean Architecture.
+The project is divided in four modules: `app`, `feature`, `business-logic` and `common`. The three last are divided into submodules, depending on their specific function, aiming to keep as much cohesion as possible in their content. The modules' content and structure are:
 
-Lastly, the elevation is fetched through the implementation of `ElevationRepository`, which its
-`getElevationForLocations` receive a list of locations and returns a list of double values
-corresponding to that set of locations.
-
-## Running the app
-The app can be run directly after building and installing it. There is at this moment a slight
-limitation, the user must grant the precise location permission or the app won't run properly.
+- `app` Module: Project's main module where the app is run. This module contains the entry point of the app, as well as the navigation management and the Dependency Injection.
+- `feature` Module: This module contains the different submodules that contain the Presentation layer. These submodules are independent from each other and may depend on various `business-logic` submodules' domain layer.
+- `business-logic` Module: Both **Data** and **Domain** layer. Each submodule here is also independent from each other and are broken into a package for each layer.
+- `common` Module: Under this module are the common tools that both `feature` and `business-logic` modules may use. They include project's entities, ui resources, networking utils, et cetera.
 
