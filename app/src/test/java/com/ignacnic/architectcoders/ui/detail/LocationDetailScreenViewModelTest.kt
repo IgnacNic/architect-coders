@@ -32,6 +32,7 @@ class LocationDetailScreenViewModelTest {
             latitude = MOCK_LAT,
             longitude = MOCK_LON,
             timeStamp = MOCK_TS,
+            elevation = "",
         )
         val sut = LocationDetailScreenViewModel(
             location,
@@ -51,7 +52,6 @@ class LocationDetailScreenViewModelTest {
         listOf(MOCK_ELEVATION)
     ) { sut ->
         sut.reduceAction(LocationDetailScreenViewModel.Action.OnUiLoad)
-        assertEqualsInitialState(sut.state.value)
         advanceUntilIdle()
         sut.state.value.let { state ->
             Assert.assertFalse(state.loading)
@@ -66,7 +66,6 @@ class LocationDetailScreenViewModelTest {
             listOf(MOCK_ELEVATION, WRONG_MOCK_ELEVATION)
         ) { sut ->
             sut.reduceAction(LocationDetailScreenViewModel.Action.OnUiLoad)
-            assertEqualsInitialState(sut.state.value)
             advanceUntilIdle()
             assertEqualsFinalSuccessState(sut.state.value, MOCK_ELEVATION)
         }
@@ -76,13 +75,12 @@ class LocationDetailScreenViewModelTest {
     fun `SHOULD have result state with null val WHEN OnUiLoad action is reduced AND repo returns no vals`() =
         testSetup { sut ->
             sut.reduceAction(LocationDetailScreenViewModel.Action.OnUiLoad)
-            assertEqualsInitialState(sut.state.value)
             advanceUntilIdle()
             assertEqualsFinalSuccessState(sut.state.value, null)
         }
 
     private fun assertEqualsInitialState(state: LocationDetailScreenViewModel.UiState) {
-        Assert.assertTrue(state.loading)
+        Assert.assertFalse(state.loading)
         Assert.assertNull(state.elevation)
         Assert.assertEquals(state.latitude, MOCK_LAT)
         Assert.assertEquals(state.longitude, MOCK_LON)

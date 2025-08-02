@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlin.time.Duration.Companion.milliseconds
 
 @Serializable
 @Parcelize
@@ -15,14 +16,14 @@ data class MyLocation (
     val latitude: String,
     val longitude: String,
     val timeStamp: String,
-) : Parcelable {
-    fun toSimpleString() = "[$latitude, $longitude]"
-}
+    val elevation: String,
+) : Parcelable
 
 fun Location.toMyLocation() = MyLocation(
     latitude = latitude.toString(),
     longitude = longitude.toString(),
-    timeStamp = time.toString(),
+    timeStamp = time.milliseconds.inWholeMilliseconds.toString(),
+    elevation = if (hasAltitude()) altitude.toString() else ""
 )
 
 val MyLocationType = object : NavType<MyLocation>(

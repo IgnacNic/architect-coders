@@ -1,10 +1,12 @@
 package com.ignacnic.architectcoders.domain.location
 
+import kotlinx.coroutines.flow.Flow
+
 interface LocationRepository {
 
-    fun requestLocationUpdates(onResult: (List<MyLocation>) -> Unit)
+    fun startLocationUpdates(): Flow<List<MyLocation>>
 
-    fun removeLocationUpdates()
+    fun stopLocationUpdates()
 
     suspend fun requestSingleLocation(onResult: (MyLocation?) -> Unit)
 }

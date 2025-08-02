@@ -24,7 +24,7 @@ class ElevationRepositoryImplTest {
         coEvery {
             elevationHttpService.getCoordinatesElevation(any(), any())
         } returns ElevationResult(elevationList)
-        val elevation = MyLocation(latitude = "test", longitude = "test", timeStamp = "")
+        val elevation = MyLocation(latitude = "test", longitude = "test", timeStamp = "", elevation = "")
         val actualResult = sut.getElevationForLocations(listOf(elevation))
         Assert.assertEquals(actualResult, elevationList)
     }
