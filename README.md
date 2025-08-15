@@ -25,4 +25,7 @@ The project is divided in four modules: `app`, `feature`, `business-logic` and `
 
 <img width="442" height="622" alt="architecture" src="https://github.com/user-attachments/assets/f73f04c1-eb69-4924-a068-cc1789b2d3a4" />
 
+
 Furthermore I've decided to go for an MVI for the presenters' pattern, each one of the defining their `Actions`, `UI State` and `One-Shot` actions (`Side-Effects`). The View Models as presenters will communicate with the Views by updating the `UI State`, and the view will communicate any user or non-user interaction by invoking the View Model's action reducer function with the relevant `Action` as parameter. For performing a UI action that is outside of the View's control (such as navigation, interacting with the OS, ...) the View Model will emit a `One-Shot` action that will be consumed by the View holder and reduced accordingly.
+
+<img width="668" height="192" alt="MVI" src="https://github.com/user-attachments/assets/cb683af4-0802-4e6c-9463-910d7d9f7b19" />
