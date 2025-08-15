@@ -12,7 +12,10 @@ The branching strategy for the project is as follows:
 3. Lastly, branches under `feature` must end with a short explanatory name, for example: `feature/ACP-18/location-updates-flows`.
 
 ## Architecture
-When deciding the project's architecture I opted for a mixed approach of Clean Architecture.
+When deciding the project's architecture I opted for a mixed approach of Clean Architecture. That is between a modularisation in features, which each module would contain every layer of said feature and a modularisation in layers, in which each module would contain only the code relevant of its layer. I opted to take the layer modularisation and restrict it to one module for UI, one for the App and another for both Data and Domain. Also, having the UI broken into feature-related submodules where they can depend on one or more Data & Domain submodules.
+
+The reason for going this way is that in the future, adding new features to the app would start just by adding a new UI submodule and only picking up the necessary Data part of the Data & Domain modules, or implementing new ones if necessary.
+
 The project is divided in four modules: `app`, `feature`, `business-logic` and `common`. The three last are divided into submodules, depending on their specific function, aiming to keep as much cohesion as possible in their content. The modules' content and structure are:
 
 - `app` Module: Project's main module where the app is run. This module contains the entry point of the app, as well as the navigation management and the Dependency Injection.
@@ -21,3 +24,5 @@ The project is divided in four modules: `app`, `feature`, `business-logic` and `
 - `common` Module: Under this module are the common tools that both `feature` and `business-logic` modules may use. They include project's entities, ui resources, networking utils, et cetera.
 
 <img width="442" height="622" alt="architecture" src="https://github.com/user-attachments/assets/f73f04c1-eb69-4924-a068-cc1789b2d3a4" />
+
+Furthermore I've decided to go for an MVI for the presenters' pattern, each one of the defining their `Actions`, `UI State` and `One-Shot` actions (`Side-Effects`). The View Models as presenters will communicate with the Views by updating the `UI State`, and the view will communicate any user or non-user interaction by invoking the View Model's action reducer function with the relevant `Action` as parameter. For performing a UI action that is outside of the View's control (such as navigation, interacting with the OS, ...) the View Model will emit a `One-Shot` action that will be consumed by the View holder and reduced accordingly.
