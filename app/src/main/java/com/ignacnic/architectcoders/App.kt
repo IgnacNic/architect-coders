@@ -1,7 +1,7 @@
 package com.ignacnic.architectcoders
 
 import android.app.Application
-import com.ignacnic.architectcoders.data.Initializer
+import com.ignacnic.architectcoders.di.Initializer
 
 class App : Application() {
     override fun onCreate() {

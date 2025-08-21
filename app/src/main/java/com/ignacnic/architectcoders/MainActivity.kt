@@ -4,23 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
-import com.ignacnic.architectcoders.data.elevationRepository
-import com.ignacnic.architectcoders.data.gpxFileRepository
-import com.ignacnic.architectcoders.data.locationRepository
-import com.ignacnic.architectcoders.data.userPreferencesRepository
-import com.ignacnic.architectcoders.domain.location.MyLocation
-import com.ignacnic.architectcoders.domain.location.MyLocationType
-import com.ignacnic.architectcoders.ui.location.detail.LocationDetailScreen
-import com.ignacnic.architectcoders.ui.location.detail.LocationDetailScreenViewModel
-import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreen
-import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel
-import com.ignacnic.architectcoders.ui.location.requester.LocationRequesterScreenViewModel.SideEffect.NavigateToLocationDetails
-import kotlin.reflect.typeOf
+import com.ignacnic.architectcoders.navigation.locationRequesterNode
+import com.ignacnic.architectcoders.navigation.Screens
+import com.ignacnic.architectcoders.navigation.locationDetailNode
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,33 +17,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             NavHost(navController, startDestination = Screens.LocationRequester) {
-                composable<Screens.LocationRequester> {
-                    LocationRequesterScreen(
-                        vm = viewModel { LocationRequesterScreenViewModel(
-                            locationRepository,
-                            userPreferencesRepository,
-                            gpxFileRepository,
-                        ) },
-                        onNavigationEffect = { effect ->
-                            if (effect is NavigateToLocationDetails) {
-                                navController.navigate(
-                                    Screens.LocationDetail(location = effect.location)
-                                )
-                            }
-                        },
-                    )
-                }
-                composable<Screens.LocationDetail>(
-                    typeMap = mapOf(typeOf<MyLocation>() to MyLocationType)
-                ) {
-                    val args = it.toRoute<Screens.LocationDetail>()
-                    LocationDetailScreen(
-                        vm = viewModel {
-                            LocationDetailScreenViewModel(args.location, elevationRepository)
-                        },
-                        onBack = navController::popBackStack,
-                    )
-                }
+                locationRequesterNode(navController)
+                locationDetailNode(navController)
             }
         }
     }
