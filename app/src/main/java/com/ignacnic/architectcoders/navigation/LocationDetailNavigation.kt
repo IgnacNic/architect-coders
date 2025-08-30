@@ -3,19 +3,19 @@ package com.ignacnic.architectcoders.navigation
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.ignacnic.architectcoders.di.elevationRepository
 import com.ignacnic.architectcoders.entities.location.MyLocation
 import com.ignacnic.architectcoders.feature.location.detail.LocationDetailScreen
 import com.ignacnic.architectcoders.feature.location.detail.LocationDetailScreenViewModel
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.locationDetailNode(appNavController: NavController) {
@@ -23,11 +23,10 @@ fun NavGraphBuilder.locationDetailNode(appNavController: NavController) {
         typeMap = mapOf(typeOf<MyLocationNavData>() to MyLocationNavType)
     ) {
         val args = it.toRoute<Screens.LocationDetail>()
-        val vm = koinViewModel<LocationDetailScreenViewModel> {
-            parametersOf(args.locationNavData.toEntity())
-        }
         LocationDetailScreen(
-            vm = vm,
+            vm = viewModel {
+                LocationDetailScreenViewModel(args.locationNavData.toEntity(), elevationRepository)
+            },
             onBack = appNavController::popBackStack,
         )
     }
