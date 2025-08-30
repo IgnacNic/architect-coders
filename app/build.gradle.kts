@@ -15,6 +15,11 @@ android {
 }
 
 dependencies {
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.compose)
+    implementation(libs.logging.interceptor)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(project(":feature:location"))
     implementation(project(":common:entities"))
     implementation(project(":common:ui-resources"))
