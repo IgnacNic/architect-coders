@@ -33,8 +33,12 @@ gradlePlugin {
             implementationClass = "com.ignacnic.convention.KotlinLibraryConventionPlugin"
         }
         create("unitTest") {
-            id = "com.ignacnic.convention.test" // This is the id we used to resolve our plugin.
+            id = "com.ignacnic.convention.test.unit" // This is the id we used to resolve our plugin.
             implementationClass = "com.ignacnic.convention.UnitTestConventionPlugin"
+        }
+        create("screenshotTest") {
+            id = "com.ignacnic.convention.test.screenshot" // This is the id we used to resolve our plugin.
+            implementationClass = "com.ignacnic.convention.ScreenshotTestConventionPlugin"
         }
     }
 }
