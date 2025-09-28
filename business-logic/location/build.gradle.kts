@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.ignacnic.android.library)
-    alias(libs.plugins.ignacnic.test)
+    alias(libs.plugins.ignacnic.test.unit)
 }
 
 android {

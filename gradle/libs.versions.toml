@@ -1,39 +1,42 @@
 [versions]
 accompanist = "0.37.3"
-agp = "8.11.1"
-androidGradlePlugin = "8.0.2"
+agp = "8.11.2"
+androidGradlePlugin = "8.11.2"
 gpxandroidsdk = "1.10.4"
-kotlin = "2.2.0"
-coreKtx = "1.16.0"
+kotlin = "2.2.20"
+coreKtx = "1.17.0"
 junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
 kotlinTest = "2.2.0"
 kotlinxCoroutinesPlayServices = "1.10.2"
 kotlinxCoroutinesTest = "1.10.2"
-lifecycleRuntimeKtx = "2.9.2"
-activityCompose = "1.10.1"
-composeBom = "2025.07.00"
+lifecycleRuntimeKtx = "2.9.3"
+activityCompose = "1.11.0"
+composeBom = "2025.09.00"
 localbroadcastmanager = "28.0.0"
-loggingInterceptor = "4.12.0"
+loggingInterceptor = "5.1.0"
 mockk = "1.14.5"
-navigationCompose = "2.9.2"
-okhttp = "4.12.0"
+navigationCompose = "2.9.4"
+okhttp = "5.1.0"
 playServicesLocation = "21.3.0"
-retrofit = "2.11.0"
+retrofit = "3.0.0"
 kotlinxSerialization = "1.9.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
 detekt = "1.23.8"
-robolectric = "4.15.1"
+robolectric = "4.16"
 appcompat = "1.7.1"
-material = "1.12.0"
-jetbrainsKotlinJvm = "2.2.0"
-koin = "4.1.0"
+material = "1.13.0"
+jetbrainsKotlinJvm = "2.2.20"
+koin = "4.1.1"
+paparazzi = "2.0.0-alpha02"
 
 # Android SDK versions
-targetSdk = "35"
-compileSdk = "35"
+targetSdk = "36"
+compileSdk = "36"
 minSdk = "29"
+uiTooling = "1.9.1"
+uiToolingVersion = "1.9.1"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
@@ -69,24 +72,28 @@ material = { group = "com.google.android.material", name = "material", version.r
 koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin" }
 koin-core = { group = "io.insert-koin", name  = "koin-core" }
 koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose" }
+paparazzi = { group = "app.cash.paparazzi", name = "paparazzi", version.ref = "paparazzi" }
 
 # Gradle plugin
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiToolingVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version = "2.2.0" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+paparazzi = { id = "app.cash.paparazzi", version.ref = "paparazzi" }
 
 # Custom convention Plugins
 ignacnic-android-application = { id = "com.ignacnic.convention.android.application", version = "unspecified" }
 ignacnic-android-library = { id = "com.ignacnic.convention.android.library", version = "unspecified" }
 ignacnic-compose = { id = "com.ignacnic.convention.compose", version = "unspecified" }
 ignacnic-kotlin-library = { id = "com.ignacnic.convention.kotlin.library", version = "unspecified" }
-ignacnic-test = { id = "com.ignacnic.convention.test", version = "unspecified" }
+ignacnic-test-unit = { id = "com.ignacnic.convention.test.unit", version = "unspecified" }
+ignacnic-test-screenshot = { id = "com.ignacnic.convention.test.screenshot", version = "unspecified" }
