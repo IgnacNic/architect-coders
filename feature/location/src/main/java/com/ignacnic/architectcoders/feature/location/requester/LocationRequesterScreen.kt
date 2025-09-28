@@ -34,12 +34,15 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.PermissionState
 import com.ignacnic.architectcoders.common.uiresources.R
 import com.ignacnic.architectcoders.common.uiresources.components.RationaleDialog
 import com.ignacnic.architectcoders.common.uiresources.components.Screen
+import com.ignacnic.architectcoders.common.uiresources.theme.ArchitectCodersTheme
 import com.ignacnic.architectcoders.common.uiresources.utils.CollectSideEffect
 import com.ignacnic.architectcoders.common.uiresources.utils.rememberDocumentPickerActivityLauncher
 import com.ignacnic.architectcoders.common.uiresources.utils.rememberDocumentTreeActivityLauncher
@@ -96,7 +99,7 @@ fun LocationRequesterScreen(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun RequesterContent(
+private fun RequesterContent(
     state: UiState,
     locationPermissionState: MultiplePermissionsState,
     reduce: (Action) -> Unit = {},
@@ -280,4 +283,106 @@ private fun TrashUpdatesDialog(
             ) { Text(stringResource(R.string.generic_cancel)) }
         },
     )
+}
+
+@ExperimentalPermissionsApi
+class MultiplePermissionsStatePreview : MultiplePermissionsState {
+
+    override val allPermissionsGranted: Boolean
+        get() = false
+
+    override val permissions: List<PermissionState>
+        get() = emptyList()
+
+    override val revokedPermissions: List<PermissionState>
+        get() = emptyList()
+
+    override val shouldShowRationale: Boolean
+        get() = true
+
+    override fun launchMultiplePermissionRequest() {
+        // do nothing
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview
+@Composable
+private fun EmptyRequesterPreview() {
+    ArchitectCodersTheme {
+        RequesterContent(
+            UiState(
+                locationUpdates = emptyList(),
+                updatesRunning = false,
+                locationRationaleNeeded = false,
+                updatesTrashRequested = false,
+            ),
+            MultiplePermissionsStatePreview(),
+        )
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview
+@Composable
+private fun DialogRequesterPreview() {
+    ArchitectCodersTheme {
+        RequesterContent(
+            UiState(
+                locationUpdates = emptyList(),
+                updatesRunning = false,
+                locationRationaleNeeded = true,
+                updatesTrashRequested = false,
+            ),
+            MultiplePermissionsStatePreview(),
+        )
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview
+@Composable
+private fun FilledRequesterPreview() {
+    ArchitectCodersTheme {
+        RequesterContent(
+            UiState(
+                locationUpdates = listOf(
+                    MyLocation(
+                        latitude = 40.42189,
+                        longitude = -3.682189,
+                        timeStamp = 0,
+                        elevation = 666.0
+                    )
+                ),
+                updatesRunning = true,
+                locationRationaleNeeded = false,
+                updatesTrashRequested = false,
+            ),
+            MultiplePermissionsStatePreview(),
+        )
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview
+@Composable
+private fun TrashRequestedPreview() {
+    ArchitectCodersTheme {
+        RequesterContent(
+            UiState(
+                locationUpdates = listOf(
+                    MyLocation(
+                        latitude = 40.42189,
+                        longitude = -3.682189,
+                        timeStamp = 0,
+                        elevation = 666.0
+                    )
+                ),
+                updatesRunning = true,
+                locationRationaleNeeded = false,
+                updatesTrashRequested = true,
+            ),
+            MultiplePermissionsStatePreview(),
+        )
+    }
 }
